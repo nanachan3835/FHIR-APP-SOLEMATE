@@ -1,0 +1,6 @@
+PyQt5
+pymongo
+pandas
+numpy
+matplotlib
+pyserial

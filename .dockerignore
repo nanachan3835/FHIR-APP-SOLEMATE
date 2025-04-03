@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env/
+.git/
+.gitignore
+.dockerignore
+Dockerfile
+README.md
+*.md
+temp_sensor_data/
+*.csv 
