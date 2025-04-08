@@ -1,5 +1,5 @@
 # --- START OF FILE main.py ---
-
+import os
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget, QWidget, QVBoxLayout, QMessageBox
 from PyQt5.QtCore import Qt
