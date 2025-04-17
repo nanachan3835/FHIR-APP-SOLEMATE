@@ -1,0 +1,2 @@
+-cần sửa lại giao diện của home 
+-sửa lại đo archindex (với 2 phần chân đo)
