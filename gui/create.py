@@ -34,6 +34,20 @@ class CreatePatientPage(QWidget):
         self.setWindowTitle("Tạo Hồ Sơ Bệnh Nhân Mới")
         self.setGeometry(100, 100, 950, 700)
 
+    # --- THÊM DÒNG NÀY ---
+        self.setStyleSheet("""
+            QLabel { color: white; }
+            QTableWidget { color: white; } /* Chữ trong ô bảng màu trắng */
+            QHeaderView::section { /* Giữ lại style header cho dễ đọc */
+                background-color: #e0e0e0;
+                color: black;
+                padding: 4px;
+                border: 1px solid #cccccc;
+                font-weight: bold;
+            }
+        """)
+        # ------
+
         self.expected_rows = 60 # Cho CSV
         self.expected_cols = 60 # Cho CSV
         self.sensor_rows = 60   # Kích thước dữ liệu cảm biến mong đợi từ cửa sổ heatmap
@@ -320,14 +334,15 @@ class CreatePatientPage(QWidget):
                  self.update_status("Lỗi dữ liệu không hợp lệ (NaN, Inf).", is_error=True)
                  self.ai_result_label.setText("Chỉ số Arch Index: Lỗi dữ liệu")
                  return
-            processed_matrix = archindex.convert_values(self.current_data_matrix, gia_tri=5)
+            processed_matrix = archindex.convert_values(self.current_data_matrix, input_max = 5.0)
             processed_matrix = archindex.Isolated_point_removal(processed_matrix)
             processed_matrix = archindex.toes_remove(processed_matrix, threshold=30)
             processed_matrix = archindex.toes_remain_removes(processed_matrix)
-            AI, foot_type = archindex.compute_arch_index(processed_matrix)
+            AI= archindex.compute_arch_index(processed_matrix)
 
             if AI is not None:
-                result_text = f"Chỉ số Arch Index: {AI:.4f} ({foot_type})"
+                result_text = f"Chỉ số Arch Index chân trái: {AI["left"]["AI"]:.4f} ({AI["left"]["type"]})\n"
+                result_text += f"Chỉ số Arch Index chân phải: {AI["right"]["AI"]:.4f} ({AI["right"]["type"]})"
                 self.ai_result_label.setText(result_text)
                 self.update_status("Tính Arch Index thành công.")
             else:

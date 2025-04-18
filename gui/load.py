@@ -99,12 +99,26 @@ class LoadPatientPage(QWidget):
         self.setWindowTitle("Load Hồ Sơ Bệnh Nhân")
         self.setGeometry(100, 100, 1000, 700) # Adjusted size
 
+        self.setStyleSheet("""
+            QLabel { color: white; }
+            QTableWidget { color: white; } /* Chữ trong ô bảng màu trắng */
+            QHeaderView::section { /* Giữ lại style header cho dễ đọc */
+                background-color: #e0e0e0;
+                color: black;
+                padding: 4px;
+                border: 1px solid #cccccc;
+                font-weight: bold;
+            }
+        """)
+
+
+
         self.selected_patient_id = None
         self.current_patient_data = None # Store full data dict of selected patient
         self.current_foot_data = None # Store numpy array of selected patient's foot data
 
         main_layout = QHBoxLayout(self)
-
+        
         # --- Left Panel: Search and List ---
         list_widget_container = QWidget()
         list_layout = QVBoxLayout(list_widget_container)
@@ -401,14 +415,15 @@ class LoadPatientPage(QWidget):
                  self.ai_result_label.setText("Chỉ số Arch Index: Lỗi dữ liệu (NaN/Inf)")
                  return
 
-            processed_matrix = archindex.convert_values(self.current_foot_data, gia_tri=5) # CHECK gia_tri=5
+            processed_matrix = archindex.convert_values(self.current_data_matrix, input_max = 5.0)
             processed_matrix = archindex.Isolated_point_removal(processed_matrix)
-            processed_matrix = archindex.toes_remove(processed_matrix, threshold=30) # Check threshold
+            processed_matrix = archindex.toes_remove(processed_matrix, threshold=30)
             processed_matrix = archindex.toes_remain_removes(processed_matrix)
-            AI, foot_type = archindex.compute_arch_index(processed_matrix)
+            AI= archindex.compute_arch_index(processed_matrix)
 
             if AI is not None:
-                result_text = f"Chỉ số Arch Index: {AI:.4f} ({foot_type})"
+                result_text = f"Chỉ số Arch Index chân trái: {AI["left"]["AI"]:.4f} ({AI["left"]["type"]})\n"
+                result_text += f"Chỉ số Arch Index chân phải: {AI["right"]["AI"]:.4f} ({AI["right"]["type"]})"
                 self.ai_result_label.setText(result_text)
             else:
                  result_text = f"Chỉ số Arch Index: Không thể tính ({foot_type})"
