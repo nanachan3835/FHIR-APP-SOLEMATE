@@ -98,7 +98,7 @@ def Isolated_point_removal(gray_image: np.ndarray) -> np.ndarray:
 
     return filtered_image
 
-def toes_remove(foot_matrix, threshold=10, rows_to_check=5):
+def toes_remove(foot_matrix, threshold=0, rows_to_check=5):
     """
     Loại bỏ dữ liệu ngón chân trong ma trận cảm biến bằng thuật toán Row Element Association.
     Args:
@@ -134,7 +134,7 @@ def toes_remove(foot_matrix, threshold=10, rows_to_check=5):
     return filtered_matrix
 
 # loại bỏ phần còn lại của ngón chân khỏi cảm biến
-def toes_remain_removes(foot_matrix, start_row=5, end_row=12, connectivity_threshold=15):
+def toes_remain_removes(foot_matrix, start_row=5, end_row=12, connectivity_threshold=20):
     """Loại bỏ các cụm pixel nhỏ còn sót lại ở vùng ngón chân."""
     filtered_matrix = foot_matrix.copy()
     rows, cols = foot_matrix.shape
@@ -209,7 +209,7 @@ def _calculate_single_foot_ai(single_foot_matrix: np.ndarray):
 
     # Tính tổng số pixel có giá trị trong từng vùng
     S_heel = np.count_nonzero(heel_region)
-    S_midfoot = np.count_nonzero(midfoot_region)
+    S_midfoot = np.count_nonzero(midfoot_region) - 60
     S_forefoot = np.count_nonzero(forefoot_region)
 
     # Tính AI
@@ -352,44 +352,45 @@ def reverse_matrix(matrix: np.ndarray) -> np.ndarray:
 
 # ===============================
 
-# if __name__ == '__main__':
-#     # Tạo dữ liệu giả 60x60
-#     # Dữ liệu này cần thực tế hơn để kiểm tra đúng
-#     dummy_data = np.zeros((60, 60))
-#     # Thêm một ít 'dấu chân' giả định
-#     dummy_data[15:55, 5:25] = np.random.rand(40, 20) * 3 # Chân trái giả
-#     dummy_data[15:55, 35:55] = np.random.rand(40, 20) * 4 # Chân phải giả (AI khác)
-#     dummy_data[5:15, 10:20] = np.random.rand(10,10) * 1 # Ít 'ngón chân' trái
-#     dummy_data[5:15, 40:50] = np.random.rand(10,10) * 1 # Ít 'ngón chân' phải
+if __name__ == '__main__':
+    # Tạo dữ liệu giả 60x60
+    # Dữ liệu này cần thực tế hơn để kiểm tra đúng
+    dummy_data = np.zeros((60, 60))
+    # Thêm một ít 'dấu chân' giả định
+    dummy_data[15:55, 5:25] = np.random.rand(40, 20) * 3 # Chân trái giả
+    dummy_data[15:55, 35:55] = np.random.rand(40, 20) * 4 # Chân phải giả (AI khác)
+    dummy_data[5:15, 10:20] = np.random.rand(10,10) * 1 # Ít 'ngón chân' trái
+    dummy_data[5:15, 40:50] = np.random.rand(10,10) * 1 # Ít 'ngón chân' phải
 
-#     print("Dữ liệu gốc (shape):", dummy_data.shape)
+    print("Dữ liệu gốc (shape):", dummy_data.shape)
 
-#     # 1. Xử lý dữ liệu
-#     processed_data = convert_values(dummy_data, input_max=5.0)
-#     processed_data = Isolated_point_removal(processed_data)
-#     processed_data = toes_remove(processed_data, threshold=15) # Giảm ngưỡng cho data giả
-#     processed_data = toes_remain_removes(processed_data, connectivity_threshold=5) # Giảm ngưỡng
+    # 1. Xử lý dữ liệu
+    processed_data = convert_values(dummy_data, input_max=5.0)
+    processed_data = Isolated_point_removal(processed_data)
+    processed_data = toes_remove(processed_data, threshold=15) # Giảm ngưỡng cho data giả
+    processed_data = toes_remain_removes(processed_data, connectivity_threshold=5) # Giảm ngưỡng
 
-#     print("Dữ liệu sau xử lý (shape):", processed_data.shape)
+    print("Dữ liệu sau xử lý (shape):", processed_data.shape)
 
-#     # 2. Tính toán Arch Index cho cả hai chân
-#     ai_results = compute_arch_index(processed_data)
+    # 2. Tính toán Arch Index cho cả hai chân
+    ai_results = compute_arch_index(processed_data)
 
-#     print("\n--- Arch Index Results ---")
-#     print(f"Left Foot - AI: {ai_results['left']['AI']}, Type: {ai_results['left']['type']}")
-#     print(f"Right Foot - AI: {ai_results['right']['AI']}, Type: {ai_results['right']['type']}")
+    print("\n--- Arch Index Results ---")
+    print(f"Left Foot - AI: {ai_results['left']['AI']}, Type: {ai_results['left']['type']}")
+    print(f"Right Foot - AI: {ai_results['right']['AI']}, Type: {ai_results['right']['type']}")
 
-#     # 3. Tính toán chiều cao (ví dụ cho chân trái)
-#     left_ai = ai_results['left']['AI']
-#     if left_ai is not None:
-#         height_left = compute_foot_height(left_ai)
-#         need_left = compute_height_need(left_ai)
-#         print(f"\n--- Left Foot Height Calculations ---")
-#         print(f"Estimated Height: {height_left}")
-#         print(f"Suggested Adjustment: {need_left}")
-#     else:
-#         print("\nCannot calculate height for left foot.")
+    # 3. Tính toán chiều cao (ví dụ cho chân trái)
+    left_ai = ai_results['left']['AI']
+    if left_ai is not None:
+        height_left = compute_foot_height(left_ai)
+        need_left = compute_height_need(left_ai)
+        print(f"\n--- Left Foot Height Calculations ---")
+        print(f"Estimated Height: {height_left}")
+        print(f"Suggested Adjustment: {need_left}")
+    else:
+        print("\nCannot calculate height for left foot.")
 
-#     # (Tương tự cho chân phải nếu cần)
-#     right_ai = ai_results['right']['AI']
-#     # ... tính toán cho chân phải ...
+    # (Tương tự cho chân phải nếu cần)
+    right_ai = ai_results['right']['AI']
+    # ... tính toán cho chân phải ...
+

@@ -41,3 +41,6 @@ dist/
 .coverage*
 htmlcov/
 .pytest_cache/
+.exe 
+dist/
+build/ 
