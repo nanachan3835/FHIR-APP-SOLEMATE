@@ -15,8 +15,6 @@
 
 #bo qua cac thu muc va file khong can thiet
 test.py
-**/assets/
-**/assets/**
 **/test/
 **/__pycache__/
 *.pyc
